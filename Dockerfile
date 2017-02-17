@@ -1,16 +1,14 @@
 FROM alpine:edge
-MAINTAINER daewood
-RUN apk add --no-cache 'su-exec>=0.2'
-RUN apk --update add  redis  && \
-    rm -rf /var/cache/apk/*
+MAINTAINER daewood <daewood@qq.com>
 
-RUN mkdir /data && chown redis:redis /data
+RUN apk --update add redis su-exec && \
+    rm -rf /var/cache/apk/* && \
+	mkdir /data && chown redis:redis /data
+	
 VOLUME ["/data"]
 WORKDIR /data
-
-COPY docker-entrypoint.sh /usr/local/bin/
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-
 EXPOSE 6379
-COPY redis.conf /usr/local/etc/redis/redis.conf
-CMD ["/usr/bin/redis-server", "/usr/local/etc/redis/redis.conf"]
+COPY redis.conf /etc/redis.conf
+COPY run.sh /root
+ENTRYPOINT [ "/root/run.sh" ]
+CMD [ "redis-server","/etc/redis.conf" ]
